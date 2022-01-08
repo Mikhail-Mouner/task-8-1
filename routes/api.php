@@ -16,7 +16,7 @@ use \App\Http\Controllers\Api\{
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::prefix('api')->group(function (){
+Route::prefix('api')->middleware('api')->group(function (){
     Route::get('companies/list', [CompanyController::class, 'getCompanies'])->name('companies.list');
     Route::get('employees/list', [EmployeeController::class, 'getEmployees'])->name('employees.list');
 });

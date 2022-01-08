@@ -2,84 +2,105 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CompanyRequest;
 use App\Models\Company;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class CompanyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return view
-     */
     public function index()
     {
-        return view('welcome');
+        return view( 'pages.company.index' );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-        //
+        return view( 'pages.company.create' );
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function store(CompanyRequest $request)
     {
-        //
+        if ($request->has( 'logo' )) {
+            $img = $request->file( 'logo' );
+            $file_name = $this->imageStore( $img, $request->name );
+        } else {
+            $file_name = 'no-image.png';
+        }
+
+        Company::create( [
+            'name' => $request->name,
+            'address' => $request->address,
+            'logo' => $file_name,
+        ] );
+
+        session()->flash( 'mssg', [ 'status' => 'success', 'data' => 'Insert Data Successfully' ] );
+
+        return redirect()->route( 'companies.index' );
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Company  $company
-     * @return \Illuminate\Http\Response
-     */
     public function show(Company $company)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Company  $company
-     * @return \Illuminate\Http\Response
-     */
     public function edit(Company $company)
     {
-        //
+        return view( 'pages.company.edit',compact('company') );
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Company  $company
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Company $company)
+    public function update(CompanyRequest $request, Company $company)
     {
-        //
+        if ($request->has( 'logo' )) {
+            $img = $request->file( 'logo' );
+            $this->removeImage( $company->logo );
+            $file_name = $this->imageStore( $img, $request->name );
+        } else {
+            $file_name = $company->logo;
+        }
+
+        $company->update( [
+            'name' => $request->name,
+            'address' => $request->address,
+            'logo' => $file_name,
+        ] );
+
+        session()->flash( 'mssg', [ 'status' => 'success', 'data' => 'Updated Data Successfully' ] );
+        return redirect()->route( 'companies.index' );
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Company  $company
+     * @param \App\Models\Company  $company
+     *
      * @return \Illuminate\Http\Response
      */
     public function destroy(Company $company)
     {
-        //
+
+        $this->removeImage( $company->logo );
+        $company->delete();
+
+        return redirect()->route( 'companies.index' );
     }
+
+    public function imageStore($img_data, $name)
+    {
+        $file_name = Str::slug( $name ) . '.' . $img_data->getClientOriginalExtension();
+        $path = Storage::disk( 'public' )->putFileAs( 'company', $img_data, $file_name );
+
+        return $path;
+    }
+    public function removeImage($logo)
+    {
+        if ($logo != 'no-image.png') {
+            Storage::disk('public')->delete($logo);
+        }
+
+        return TRUE;
+    }
+
 }

@@ -18,7 +18,7 @@ class CreateEmployeesTable extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('image')->default('user.png');
+            $table->string('image')->default('no-image.png');
             $table->foreignId( 'company_id' )->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

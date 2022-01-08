@@ -12,16 +12,20 @@ class CompanyController extends Controller
     public function getCompanies(Request $request)
     {
         if ($request->ajax()) {
-            $data = Company::latest()->get();
-            return DataTables::of($data)
+            $data = Company::withCount('employees')->latest()->get();
+
+            return DataTables::of( $data )
                 ->addIndexColumn()
-                ->editColumn('logo', '<img src="{{$logo}}" />')
-                ->addColumn('action', function($row){
-                    $actionBtn = '<a href="javascript:void(0)" class="edit btn btn-success btn-sm">Edit</a> <a href="javascript:void(0)" class="delete btn btn-danger btn-sm">Delete</a>';
+                ->editColumn( 'logo', '<img width="50px" height="50px" src="{{$img_url}}" />' )
+                ->addColumn( 'action', function ($row) {
+                    $actionBtn = '<a href="'.route('companies.edit',$row->id).'" class="edit btn btn-success btn-sm">Edit</a>';
+                    $actionBtn .= '<a href="#" data-action="'.route('companies.destroy',$row->id).'" class="delete btn btn-danger btn-sm">Delete</a>';
+
                     return $actionBtn;
-                })
-                ->rawColumns(['logo','action'])
-                ->make(true);
+                } )
+                ->rawColumns( [ 'logo', 'action' ] )
+                ->make( TRUE );
         }
     }
+
 }

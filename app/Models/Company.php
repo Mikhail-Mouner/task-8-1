@@ -15,7 +15,12 @@ class Company extends Model
         'address',
         'logo',
     ];
+    protected $appends = ['img_url'];
 
+    public function getImgUrlAttribute()
+    {
+        return asset("storage/".$this->logo);
+    }
     public function employees(): HasMany
     {
         return $this->hasMany( Employee::class );

@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers\{
-    CompanyController
+    CompanyController,
+    EmployeeController
 };
 /*
 |--------------------------------------------------------------------------
@@ -17,7 +18,10 @@ use \App\Http\Controllers\{
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
 //Route::get('companies', [CompanyController::class,'index']);
-Route::resource('companies', CompanyController::class);
+Route::resources([
+    'companies'=> CompanyController::class,
+    'employees'=> EmployeeController::class,
+]);

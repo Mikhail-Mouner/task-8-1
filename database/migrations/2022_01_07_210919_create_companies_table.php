@@ -17,7 +17,7 @@ class CreateCompaniesTable extends Migration
             $table->id();
             $table->string('name')->unique();
             $table->string('address')->nullable();
-            $table->string('logo')->default('logo.png');
+            $table->string('logo')->default('no-image.png');
             $table->timestamps();
         });
     }
