@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\EmployeeRequest;
 use App\Models\Company;
 use App\Models\Employee;
+use App\Notifications\NewEmployeeNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -33,13 +34,15 @@ class EmployeeController extends Controller
             $file_name = 'no-image.png';
         }
 
-        Employee::create( [
+        $employee = Employee::create( [
             'name' => $request->name,
             'email' => $request->email,
             'company_id' => $request->company_id,
             'password' => Hash::make($request->password),
             'image' => $file_name,
         ] );
+
+        $employee->notify( new NewEmployeeNotification() );
 
         session()->flash( 'mssg', [ 'status' => 'success', 'data' => 'Insert Data Successfully' ] );
 
