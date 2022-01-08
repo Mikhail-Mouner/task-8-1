@@ -15,7 +15,9 @@ class EmployeeController extends Controller
 {
     public function index()
     {
-        return view( 'pages.employee.index' );
+        $companies = Company::all();
+
+        return view( 'pages.employee.index', compact( 'companies' ) );
     }
 
     public function create()
@@ -38,7 +40,7 @@ class EmployeeController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'company_id' => $request->company_id,
-            'password' => Hash::make($request->password),
+            'password' => Hash::make( $request->password ),
             'image' => $file_name,
         ] );
 

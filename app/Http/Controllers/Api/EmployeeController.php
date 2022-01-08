@@ -12,7 +12,11 @@ class EmployeeController extends Controller
     public function getEmployees(Request $request)
     {
         if ($request->ajax()) {
-            $data = Employee::with('company')->latest()->get();
+            $data = Employee::with( 'company' )
+                ->when( $request->company_id, function ($instance) use ($request) {
+                    $instance->where( 'company_id', $request->company_id );
+                } )
+                ->latest()->get();
 
             return DataTables::of( $data )
                 ->addIndexColumn()
@@ -26,13 +30,13 @@ class EmployeeController extends Controller
                     return $actionBtn;
                 } )
                 ->editColumn( 'company', function ($row) {
-                    $actionBtn = '<img width="50px" height="50px" src="'.$row->company->img_url.'" />';
+                    $actionBtn = '<img width="50px" height="50px" src="' . $row->company->img_url . '" />';
                     $actionBtn .= '<br />';
-                    $actionBtn .= 'Company: '.$row->company->name;
+                    $actionBtn .= 'Company: ' . $row->company->name;
 
                     return $actionBtn;
                 } )
-                ->rawColumns( [ 'image', 'action','company' ] )
+                ->rawColumns( [ 'image', 'action', 'company' ] )
                 ->make( TRUE );
         }
     }
