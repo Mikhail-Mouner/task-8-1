@@ -20,6 +20,13 @@ class Employee extends Model
         'password',
     ];
 
+    protected $appends = [ 'img_url' ];
+
+    public function getImgUrlAttribute()
+    {
+        return asset( "storage/" . $this->image );
+    }
+
     public function company(): BelongsTo
     {
         return $this->belongsTo( Company::class );

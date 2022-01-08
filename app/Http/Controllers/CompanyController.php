@@ -94,6 +94,7 @@ class CompanyController extends Controller
 
         return $path;
     }
+
     public function removeImage($logo)
     {
         if ($logo != 'no-image.png') {
